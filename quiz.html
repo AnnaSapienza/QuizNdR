@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Vero/Falso</title>
+    <title>Caccia alle Fake News</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,46 +21,56 @@
         }
 
         #main-container {
-            background-color: #fff;
+            background-color: #d90429; /* Bright red from poster */
             padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 4px solid #ffc300; /* Yellow from poster */
             width: 90%;
             max-width: 600px;
             text-align: center;
         }
 
-        #description-container h2 {
-            font-size: 2rem;
+        #description-container h2, #results-container h2 {
+            font-family: 'Anton', sans-serif;
+            font-size: 3rem;
+            color: #ffc300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             margin-bottom: 1rem;
+            -webkit-text-stroke: 1px black;
         }
 
         #description-container p {
             font-size: 1.2rem;
             line-height: 1.6;
             margin-bottom: 2rem;
+            color: #fff;
         }
 
         #start-btn {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
+            font-family: 'Anton', sans-serif;
+            background-color: #ffc300;
+            color: #000;
+            border: 2px solid #000;
+            border-radius: 0;
             padding: 0.8rem 2rem;
-            font-size: 1.1rem;
+            font-size: 1.5rem;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.2s;
         }
 
         #start-btn:hover {
-            background-color: #0056b3;
+            background-color: #fff;
+            transform: scale(1.05);
         }
 
         #question-label {
-            font-size: 1.2rem;
+            font-family: 'Anton', sans-serif;
+            font-size: 1.5rem;
             font-weight: bold;
-            color: #555;
+            color: #ffc300;
             margin-bottom: 1rem;
+            text-transform: uppercase;
         }
 
         #question-text {
@@ -67,54 +80,61 @@
         }
 
         .answer-btn {
-            background-color: #f0f0f0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            font-family: 'Anton', sans-serif;
+            background-color: #000;
+            color: #ffc300;
+            border: 2px solid #ffc300;
+            border-radius: 0;
             padding: 0.8rem 1.5rem;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             cursor: pointer;
             margin: 0 0.5rem;
-            transition: background-color 0.2s, border-color 0.2s;
+            transition: background-color 0.2s, color 0.2s;
+            text-transform: uppercase;
         }
 
         .answer-btn:hover {
-            background-color: #e0e0e0;
-            border-color: #ccc;
+            background-color: #ffc300;
+            color: #000;
         }
 
         .answer-btn.selected {
-            background-color: #007bff;
-            color: #fff;
-            border-color: #0056b3;
+            background-color: #ffc300;
+            color: #000;
+            transform: scale(1.1);
         }
 
         #nav-container {
             margin-top: 2rem;
         }
-
-        #next-btn {
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
+        
+        #next-btn, #download-btn {
+             font-family: 'Anton', sans-serif;
+            background-color: #ffc300;
+            color: #000;
+            border: 2px solid #000;
+            border-radius: 0;
             padding: 0.8rem 2rem;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, transform 0.2s;
         }
 
         #next-btn:disabled {
-            background-color: #9ddaa7;
+            background-color: #a37f00;
+            color: #555;
             cursor: not-allowed;
+            transform: none;
+        }
+
+        #next-btn:hover:not(:disabled), #download-btn:hover {
+            background-color: #fff;
+            transform: scale(1.05);
         }
 
         #results-container {
             display: none;
-        }
-        
-        #results-container h2 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
         }
         
         #score-text {
@@ -125,32 +145,9 @@
         
         #feedback-text {
             font-size: 1.2rem;
-            color: #0056b3;
-            font-style: italic;
-            margin-bottom: 2rem;
-        }
-
-        #feedback-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-top: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        #download-btn {
-            background-color: #17a2b8;
             color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 0.8rem 2rem;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        #download-btn:hover {
-            background-color: #138496;
+            font-weight: bold;
+            margin-bottom: 2rem;
         }
 
     </style>
@@ -159,14 +156,14 @@
 
     <div id="main-container">
         <div id="description-container">
-            <h2>Benvenuto al Quiz!</h2>
-            <p>Questo è un quiz di 7 domande vero/falso. Rispondi a ogni domanda e scopri il tuo punteggio alla fine. Buona fortuna!</p>
+            <h2>Caccia alle Fake News!</h2>
+            <p>Sei pronto a diventare un algoritmo? Metti alla prova il tuo "sesto senso" e scopri se riesci a riconoscere la verità dalle bugie. Inizia il quiz!</p>
             <button id="start-btn">Inizia il Quiz</button>
         </div>
 
         <div id="quiz-container" style="display: none;">
-            <div id="question-label">Poster 1</div>
-            <p id="question-text">Questa è la prima domanda.</p>
+            <div id="question-label">Domanda 1</div>
+            <p id="question-text">Testo della domanda...</p>
             <div id="answer-buttons">
                 <button class="answer-btn" onclick="selectAnswer(true)">Vero</button>
                 <button class="answer-btn" onclick="selectAnswer(false)">Falso</button>
@@ -177,29 +174,28 @@
         </div>
 
         <div id="results-container">
-            <h2>Il Tuo Punteggio Finale</h2>
+            <h2>Punteggio Finale</h2>
             <p id="score-text"></p>
             <p id="feedback-text"></p>
-            <img id="feedback-image" src="" alt="Immagine di feedback">
             <button id="download-btn">Scarica Riepilogo</button>
         </div>
     </div>
 
     <script>
         const quizData = [
-            { label: "Poster 1", question: "Il cielo è blu perché riflette l'oceano.", answer: false },
-            { label: "Poster 2", question: "La Grande Muraglia Cinese è visibile dallo spazio a occhio nudo.", answer: false },
-            { label: "Poster 3", question: "Le banane crescono sugli alberi.", answer: false },
-            { label: "Poster 4", question: "Un polpo ha tre cuori.", answer: true },
-            { label: "Poster 5", question: "Il suono viaggia più velocemente nell'acqua che nell'aria.", answer: true },
-            { label: "Poster 6", question: "Venere è il pianeta più caldo del nostro sistema solare.", answer: true },
-            { label: "Poster 7", question: "Il Monte Everest è la montagna più alta del mondo misurata dal livello del mare.", answer: true }
+            { label: "Domanda 1", question: "Le fake news sono semplici errori di distrazione.", answer: false },
+            { label: "Domanda 2", question: "Le fake news sono create apposta per ingannare chi legge.", answer: true },
+            { label: "Domanda 3", question: "Gli algoritmi di detection sono come dei detective digitali che proteggono dalle bufale.", answer: true },
+            { label: "Domanda 4", question: "L'attività euristica è un'abilità che solo i computer possiedono.", answer: false },
+            { label: "Domanda 5", question: "Un titolo 'click-bait' è generalmente un segnale di una notizia affidabile.", answer: false },
+            { label: "Domanda 6", question: "Un linguaggio molto emotivo può essere un indizio di una fake news.", answer: true },
+            { label: "Domanda 7", question: "Secondo il poster, l'obiettivo finale è che tu stesso diventi un 'algoritmo' nel riconoscere le bugie.", answer: true }
         ];
 
         let currentQuestionIndex = 0;
         let score = 0;
         let userAnswer = null;
-        const userAnswersLog = []; // Array per memorizzare le risposte dell'utente
+        const userAnswersLog = [];
 
         // Elementi DOM
         const descriptionContainer = document.getElementById('description-container');
@@ -212,55 +208,41 @@
         const nextBtn = document.getElementById('next-btn');
         const scoreTextEl = document.getElementById('score-text');
         const feedbackTextEl = document.getElementById('feedback-text');
-        const feedbackImageEl = document.getElementById('feedback-image');
         const downloadBtn = document.getElementById('download-btn');
         
-        // --- Funzioni ---
-
         function startQuiz() {
             descriptionContainer.style.display = 'none';
             quizContainer.style.display = 'block';
             loadQuestion();
         }
 
-        /** Carica la domanda corrente nell'interfaccia utente */
         function loadQuestion() {
             userAnswer = null;
             answerButtons.forEach(btn => btn.classList.remove('selected'));
-            
             const currentQuestion = quizData[currentQuestionIndex];
             questionLabelEl.textContent = currentQuestion.label;
             questionTextEl.textContent = currentQuestion.question;
-
             nextBtn.disabled = true;
         }
 
-        /** Gestisce la selezione della risposta dell'utente */
         function selectAnswer(answer) {
             userAnswer = answer;
-            
             answerButtons.forEach(btn => btn.classList.remove('selected'));
             const selectedButton = (answer) ? answerButtons[0] : answerButtons[1];
             selectedButton.classList.add('selected');
-            
             nextBtn.disabled = false;
         }
 
-        /** Passa alla domanda successiva o mostra i risultati */
         function handleNext() {
             if (userAnswer === quizData[currentQuestionIndex].answer) {
                 score++;
             }
-
-            // Salva la risposta dell'utente per il riepilogo
             userAnswersLog.push({
                 label: quizData[currentQuestionIndex].label,
                 question: quizData[currentQuestionIndex].question,
-                userAnswer: userAnswer, // Solo la risposta data
+                userAnswer: userAnswer,
             });
-
             currentQuestionIndex++;
-
             if (currentQuestionIndex < quizData.length) {
                 loadQuestion();
             } else {
@@ -268,100 +250,48 @@
             }
         }
         
-        /** Mostra il punteggio finale, il feedback e l'immagine associata */
         function showResults() {
             quizContainer.style.display = 'none';
             resultsContainer.style.display = 'block';
             scoreTextEl.textContent = `${score} su ${quizData.length}`;
-
             let feedback;
-            let imageUrl;
             if (score <= 2) {
                 feedback = "Algoritmo in fase di training";
-                // Image for 'in training'
             } else if (score <= 5) {
                 feedback = "Algoritmo attento";
-                // Image for 'attento'
             } else {
                 feedback = "Algoritmo esperto";
-                // Image for 'esperto'
             }
             feedbackTextEl.textContent = feedback;
-            
-            // Set the image based on feedback
-            if (feedback === "Algoritmo in fase di training") {
-                feedbackImageEl.src = "feedback_training.png"; // Placeholder
-            } else if (feedback === "Algoritmo attento") {
-                feedbackImageEl.src = "feedback_attento.png"; // Placeholder
-            } else { // Algoritmo esperto
-                feedbackImageEl.src = "feedback_esperto.png"; // Placeholder
-            }
-            feedbackImageEl.style.display = 'block'; // Show the image
-
         }
         
-        /** Crea e scarica un file .txt con il riepilogo del quiz e l'immagine di feedback */
-        async function downloadResults() {
-            // -- Parte 1: Download del file di testo (.txt) --
-            let summaryText = `Riepilogo del Quiz\n\n`;
+        function downloadResults() {
+            let summaryText = `Riepilogo del Quiz "Caccia alle Fake News"\n\n`;
             summaryText += `PUNTEGGIO FINALE: ${score} / ${quizData.length}\n`;
             summaryText += `FEEDBACK: ${feedbackTextEl.textContent}\n\n`;
             summaryText += `--------------------------------------\n`;
             summaryText += `RIEPILOGO DELLE RISPOSTE\n`;
             summaryText += `--------------------------------------\n\n`;
-
             userAnswersLog.forEach((log) => {
                 const userAnswerText = log.userAnswer ? 'Vero' : 'Falso';
-
                 summaryText += `${log.label}: ${log.question}\n`;
                 summaryText += `  - La tua risposta: ${userAnswerText}\n\n`;
             });
-            
             const blob = new Blob([summaryText], { type: 'text/plain;charset=utf-8' });
-            const textUrl = URL.createObjectURL(blob);
-            
-            const a_text = document.createElement('a');
-            a_text.href = textUrl;
-            a_text.download = 'riepilogo_quiz.txt';
-            document.body.appendChild(a_text);
-            a_text.click();
-            document.body.removeChild(a_text);
-            URL.revokeObjectURL(textUrl);
-
-            // -- Parte 2: Download dell'immagine di feedback (.png) --
-            try {
-                // Fetch the image data from its source (works for local files and Base64 URLs)
-                const response = await fetch(feedbackImageEl.src);
-                const imageBlob = await response.blob();
-                
-                // Create a temporary URL for the blob
-                const imageUrl = URL.createObjectURL(imageBlob);
-
-                // Create a link and trigger the download
-                const a_image = document.createElement('a');
-                a_image.href = imageUrl; 
-                a_image.download = 'immagine_risultato.png';
-                document.body.appendChild(a_image);
-                a_image.click();
-                
-                // Clean up by removing the link and revoking the temporary URL
-                document.body.removeChild(a_image);
-                URL.revokeObjectURL(imageUrl);
-
-            } catch (error) {
-                console.error("Errore nel download dell'immagine:", error);
-                alert("Impossibile scaricare l'immagine. Potrebbe essere un problema con il percorso del file o le policy del browser.");
-            }
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'riepilogo_quiz.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         // --- Event Listeners ---
         startBtn.addEventListener('click', startQuiz);
         nextBtn.addEventListener('click', handleNext);
         downloadBtn.addEventListener('click', downloadResults);
-        
-        // --- Caricamento Iniziale ---
-        // Rimosso il caricamento automatico della prima domanda
-        // window.addEventListener('load', loadQuestion);
 
     </script>
 </body>
