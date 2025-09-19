@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: 'Helvetica Neue', sans-serif;
@@ -19,16 +20,14 @@
             margin: 0;
             padding: 1rem 0;
         }
-
         #main-container {
-            background-color: #d90429; /* Bright red from poster */
+            background-color: #d90429;
             padding: 2rem;
-            border: 4px solid #ffc300; /* Yellow from poster */
+            border: 4px solid #ffc300;
             width: 90%;
             max-width: 600px;
             text-align: center;
         }
-
         #description-container h2, #results-container h2 {
             font-family: 'Anton', sans-serif;
             font-size: 3rem;
@@ -38,14 +37,12 @@
             margin-bottom: 1rem;
             -webkit-text-stroke: 1px black;
         }
-
         #description-container p {
             font-size: 1.2rem;
             line-height: 1.6;
             margin-bottom: 2rem;
             color: #fff;
         }
-
         #start-btn {
             font-family: 'Anton', sans-serif;
             background-color: #ffc300;
@@ -58,12 +55,10 @@
             cursor: pointer;
             transition: background-color 0.2s, transform 0.2s;
         }
-
         #start-btn:hover {
             background-color: #fff;
             transform: scale(1.05);
         }
-
         #question-label {
             font-family: 'Anton', sans-serif;
             font-size: 1.5rem;
@@ -72,13 +67,11 @@
             margin-bottom: 1rem;
             text-transform: uppercase;
         }
-
         #question-text {
             font-size: 1.4rem;
             margin-bottom: 2rem;
             min-height: 60px;
         }
-
         .answer-btn {
             font-family: 'Anton', sans-serif;
             background-color: #000;
@@ -92,22 +85,18 @@
             transition: background-color 0.2s, color 0.2s;
             text-transform: uppercase;
         }
-
         .answer-btn:hover {
             background-color: #ffc300;
             color: #000;
         }
-
         .answer-btn.selected {
             background-color: #ffc300;
             color: #000;
             transform: scale(1.1);
         }
-
         #nav-container {
             margin-top: 2rem;
         }
-        
         #next-btn, #download-btn {
              font-family: 'Anton', sans-serif;
             background-color: #ffc300;
@@ -120,45 +109,29 @@
             cursor: pointer;
             transition: background-color 0.2s, transform 0.2s;
         }
-
         #next-btn:disabled {
             background-color: #a37f00;
             color: #555;
             cursor: not-allowed;
             transform: none;
         }
-
         #next-btn:hover:not(:disabled), #download-btn:hover {
             background-color: #fff;
             transform: scale(1.05);
         }
-
         #results-container {
             display: none;
         }
-        
         #score-text {
-            font-family: 'Anton', sans-serif; /* Added font */
-            font-size: 3rem; /* Made bigger */
-            color: #ffc300; /* Yellow color */
+            font-family: 'Anton', sans-serif;
+            font-size: 3rem;
+            color: #ffc300;
             font-weight: bold;
-            margin-top: 2rem; /* Added spacing */
-            margin-bottom: 1rem;
-            text-transform: uppercase; /* Uppercase */
-            -webkit-text-stroke: 1px black; /* Outline */
+            margin-top: 2rem;
+            margin-bottom: 2rem; /* Adjusted spacing */
+            text-transform: uppercase;
+            -webkit-text-stroke: 1px black;
         }
-        
-        #feedback-text {
-            display: none; /* Hidden as requested */
-        }
-        
-        #feedback-image {
-            display: none; /* Hidden by default, shown by JS */
-            max-width: 250px; /* Increased size */
-            height: auto;
-            margin: 1rem auto 2rem auto;
-        }
-
     </style>
 </head>
 <body>
@@ -185,13 +158,13 @@
         <div id="results-container">
             <h2>Punteggio Finale</h2>
             <p id="score-text"></p>
-            <p id="feedback-text"></p>
-            <img id="feedback-image" src="" alt="Immagine di feedback">
             <button id="download-btn">Scarica Riepilogo</button>
         </div>
     </div>
 
     <script>
+        const { jsPDF } = window.jspdf;
+
         const quizData = [
             { label: "Domanda 1", question: "Le fake news sono semplici errori di distrazione.", answer: false },
             { label: "Domanda 2", question: "Le fake news sono create apposta per ingannare chi legge.", answer: true },
@@ -207,7 +180,6 @@
         let userAnswer = null;
         const userAnswersLog = [];
 
-        // Elementi DOM
         const descriptionContainer = document.getElementById('description-container');
         const startBtn = document.getElementById('start-btn');
         const quizContainer = document.getElementById('quiz-container');
@@ -217,8 +189,6 @@
         const answerButtons = document.querySelectorAll('.answer-btn');
         const nextBtn = document.getElementById('next-btn');
         const scoreTextEl = document.getElementById('score-text');
-        const feedbackTextEl = document.getElementById('feedback-text');
-        const feedbackImageEl = document.getElementById('feedback-image');
         const downloadBtn = document.getElementById('download-btn');
         
         function startQuiz() {
@@ -265,52 +235,55 @@
             quizContainer.style.display = 'none';
             resultsContainer.style.display = 'block';
             scoreTextEl.textContent = `${score} su ${quizData.length}`;
-            let feedback;
-            let imageUrl;
-            
-            if (score <= 2) {
-                feedback = "Algoritmo Principiante";
-                imageUrl = "feedback_training.png";
-            } else if (score <= 5) {
-                feedback = "Algoritmo Attento";
-                imageUrl = "feedback_attento.png";
-            } else {
-                feedback = "Algoritmo Esperto";
-                imageUrl = "feedback_esperto.png";
-            }
-            feedbackTextEl.textContent = feedback; // Text is set but not displayed
-            feedbackImageEl.src = imageUrl;
-            feedbackImageEl.style.display = 'block'; 
         }
         
         function downloadResults() {
-            let summaryText = `Riepilogo del Quiz "Caccia alle Fake News"\n\n`;
-            summaryText += `PUNTEGGIO FINALE: ${score} / ${quizData.length}\n`;
-            summaryText += `FEEDBACK: ${feedbackTextEl.textContent}\n\n`; // Correctly gets the hidden text
-            summaryText += `--------------------------------------\n`;
-            summaryText += `RIEPILOGO DELLE RISPOSTE\n`;
-            summaryText += `--------------------------------------\n\n`;
+            const doc = new jsPDF();
+
+            // --- PDF Header ---
+            doc.setFontSize(22);
+            doc.setFont("helvetica", "bold");
+            doc.text("Riepilogo del Quiz: Caccia alle Fake News", 105, 20, { align: "center" });
+
+            // --- Score and Feedback ---
+            let feedback;
+            if (score <= 2) {
+                feedback = "Algoritmo Principiante";
+            } else if (score <= 5) {
+                feedback = "Algoritmo Attento";
+            } else {
+                feedback = "Algoritmo Esperto";
+            }
+
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "normal");
+            doc.text(`PUNTEGGIO FINALE: ${score} / ${quizData.length}`, 105, 35, { align: "center" });
+            doc.text(`FEEDBACK: ${feedback}`, 105, 45, { align: "center" });
+
+            // --- Divider Line ---
+            doc.setLineWidth(0.5);
+            doc.line(20, 55, 190, 55);
+
+            // --- Answers Section ---
+            let reportText = "";
             userAnswersLog.forEach((log) => {
                 const userAnswerText = log.userAnswer ? 'Vero' : 'Falso';
-                summaryText += `${log.label}: ${log.question}\n`;
-                summaryText += `  - La tua risposta: ${userAnswerText}\n\n`;
+                reportText += `${log.label}: ${log.question}\n`;
+                reportText += `   - La tua risposta: ${userAnswerText}\n\n`;
             });
-            const blob = new Blob([summaryText], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'riepilogo_quiz.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+
+            doc.setFontSize(12);
+            doc.text(reportText, 20, 65, {
+                maxWidth: 170, // This ensures text wraps and creates new pages automatically
+            });
+
+            // --- Save the PDF ---
+            doc.save('riepilogo_quiz.pdf');
         }
 
-        // --- Event Listeners ---
         startBtn.addEventListener('click', startQuiz);
         nextBtn.addEventListener('click', handleNext);
         downloadBtn.addEventListener('click', downloadResults);
-
     </script>
 </body>
 </html>
