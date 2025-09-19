@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Vero/Falso</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem 0;
+        }
+
+        #main-container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        #question-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        #question-text {
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
+            min-height: 60px;
+        }
+
+        .answer-btn {
+            background-color: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 0 0.5rem;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .answer-btn:hover {
+            background-color: #e0e0e0;
+            border-color: #ccc;
+        }
+
+        .answer-btn.selected {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #0056b3;
+        }
+
+        #nav-container {
+            margin-top: 2rem;
+        }
+
+        #next-btn {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #next-btn:disabled {
+            background-color: #9ddaa7;
+            cursor: not-allowed;
+        }
+
+        #results-container {
+            display: none;
+        }
+        
+        #results-container h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        #score-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        #feedback-text {
+            font-size: 1.2rem;
+            color: #0056b3;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+
+        #feedback-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        #download-btn {
+            background-color: #17a2b8;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        #download-btn:hover {
+            background-color: #138496;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+        <div id="quiz-container">
+            <div id="question-label">Poster 1</div>
+            <p id="question-text">Questa è la prima domanda.</p>
+            <div id="answer-buttons">
+                <button class="answer-btn" onclick="selectAnswer(true)">Vero</button>
+                <button class="answer-btn" onclick="selectAnswer(false)">Falso</button>
+            </div>
+            <div id="nav-container">
+                <button id="next-btn" disabled>Prossimo</button>
+            </div>
+        </div>
+
+        <div id="results-container">
+            <h2>Il Tuo Punteggio Finale</h2>
+            <p id="score-text"></p>
+            <p id="feedback-text"></p>
+            <img id="feedback-image" src="" alt="Immagine di feedback">
+            <button id="download-btn">Scarica Riepilogo</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            { label: "Poster 1", question: "Il cielo è blu perché riflette l'oceano.", answer: false },
+            { label: "Poster 2", question: "La Grande Muraglia Cinese è visibile dallo spazio a occhio nudo.", answer: false },
+            { label: "Poster 3", question: "Le banane crescono sugli alberi.", answer: false },
+            { label: "Poster 4", question: "Un polpo ha tre cuori.", answer: true },
+            { label: "Poster 5", question: "Il suono viaggia più velocemente nell'acqua che nell'aria.", answer: true },
+            { label: "Poster 6", question: "Venere è il pianeta più caldo del nostro sistema solare.", answer: true },
+            { label: "Poster 7", question: "Il Monte Everest è la montagna più alta del mondo misurata dal livello del mare.", answer: true }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswer = null;
+        const userAnswersLog = []; // Array per memorizzare le risposte dell'utente
+
+        // Elementi DOM
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        const questionLabelEl = document.getElementById('question-label');
+        const questionTextEl = document.getElementById('question-text');
+        const answerButtons = document.querySelectorAll('.answer-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreTextEl = document.getElementById('score-text');
+        const feedbackTextEl = document.getElementById('feedback-text');
+        const feedbackImageEl = document.getElementById('feedback-image');
+        const downloadBtn = document.getElementById('download-btn');
+        
+        // --- Funzioni ---
+
+        /** Carica la domanda corrente nell'interfaccia utente */
+        function loadQuestion() {
+            userAnswer = null;
+            answerButtons.forEach(btn => btn.classList.remove('selected'));
+            
+            const currentQuestion = quizData[currentQuestionIndex];
+            questionLabelEl.textContent = currentQuestion.label;
+            questionTextEl.textContent = currentQuestion.question;
+
+            nextBtn.disabled = true;
+        }
+
+        /** Gestisce la selezione della risposta dell'utente */
+        function selectAnswer(answer) {
+            userAnswer = answer;
+            
+            answerButtons.forEach(btn => btn.classList.remove('selected'));
+            const selectedButton = (answer) ? answerButtons[0] : answerButtons[1];
+            selectedButton.classList.add('selected');
+            
+            nextBtn.disabled = false;
+        }
+
+        /** Passa alla domanda successiva o mostra i risultati */
+        function handleNext() {
+            if (userAnswer === quizData[currentQuestionIndex].answer) {
+                score++;
+            }
+
+            // Salva la risposta dell'utente per il riepilogo
+            userAnswersLog.push({
+                label: quizData[currentQuestionIndex].label,
+                question: quizData[currentQuestionIndex].question,
+                userAnswer: userAnswer, // Solo la risposta data
+            });
+
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+        
+        /** Mostra il punteggio finale, il feedback e l'immagine associata */
+        function showResults() {
+            quizContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            scoreTextEl.textContent = `${score} su ${quizData.length}`;
+
+            let feedback;
+            let imageUrl;
+            if (score <= 2) {
+                feedback = "Algoritmo in fase di training";
+                // Image for 'in training'
+            } else if (score <= 5) {
+                feedback = "Algoritmo attento";
+                // Image for 'attento'
+            } else {
+                feedback = "Algoritmo esperto";
+                // Image for 'esperto'
+            }
+            feedbackTextEl.textContent = feedback;
+            
+            // Set the image based on feedback
+            if (feedback === "Algoritmo in fase di training") {
+                feedbackImageEl.src = "feedback_training.png"; // Placeholder
+            } else if (feedback === "Algoritmo attento") {
+                feedbackImageEl.src = "feedback_attento.png"; // Placeholder
+            } else { // Algoritmo esperto
+                feedbackImageEl.src = "feedback_esperto.png"; // Placeholder
+            }
+            feedbackImageEl.style.display = 'block'; // Show the image
+
+        }
+        
+        /** Crea e scarica un file .txt con il riepilogo del quiz */
+        function downloadResults() {
+            let summaryText = `Riepilogo del Quiz\n\n`;
+            summaryText += `PUNTEGGIO FINALE: ${score} / ${quizData.length}\n`;
+            summaryText += `FEEDBACK: ${feedbackTextEl.textContent}\n\n`;
+            summaryText += `--------------------------------------\n`;
+            summaryText += `RIEPILOGO DELLE RISPOSTE\n`;
+            summaryText += `--------------------------------------\n\n`;
+
+            userAnswersLog.forEach((log) => {
+                const userAnswerText = log.userAnswer ? 'Vero' : 'Falso';
+
+                summaryText += `${log.label}: ${log.question}\n`;
+                summaryText += `  - La tua risposta: ${userAnswerText}\n\n`;
+            });
+            
+            const blob = new Blob([summaryText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'riepilogo_quiz.txt';
+            document.body.appendChild(a);
+            a.click();
+            
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // --- Event Listeners ---
+        nextBtn.addEventListener('click', handleNext);
+        downloadBtn.addEventListener('click', downloadResults);
+        
+        // --- Caricamento Iniziale ---
+        window.addEventListener('load', loadQuestion);
+
+    </script>
+</body>
+</html>
