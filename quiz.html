@@ -27,6 +27,32 @@
             text-align: center;
         }
 
+        #description-container h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        #description-container p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        #start-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #start-btn:hover {
+            background-color: #0056b3;
+        }
+
         #question-label {
             font-size: 1.2rem;
             font-weight: bold;
@@ -132,7 +158,13 @@
 <body>
 
     <div id="main-container">
-        <div id="quiz-container">
+        <div id="description-container">
+            <h2>Benvenuto al Quiz!</h2>
+            <p>Questo è un quiz di 7 domande vero/falso. Rispondi a ogni domanda e scopri il tuo punteggio alla fine. Buona fortuna!</p>
+            <button id="start-btn">Inizia il Quiz</button>
+        </div>
+
+        <div id="quiz-container" style="display: none;">
             <div id="question-label">Poster 1</div>
             <p id="question-text">Questa è la prima domanda.</p>
             <div id="answer-buttons">
@@ -170,6 +202,8 @@
         const userAnswersLog = []; // Array per memorizzare le risposte dell'utente
 
         // Elementi DOM
+        const descriptionContainer = document.getElementById('description-container');
+        const startBtn = document.getElementById('start-btn');
         const quizContainer = document.getElementById('quiz-container');
         const resultsContainer = document.getElementById('results-container');
         const questionLabelEl = document.getElementById('question-label');
@@ -182,6 +216,12 @@
         const downloadBtn = document.getElementById('download-btn');
         
         // --- Funzioni ---
+
+        function startQuiz() {
+            descriptionContainer.style.display = 'none';
+            quizContainer.style.display = 'block';
+            loadQuestion();
+        }
 
         /** Carica la domanda corrente nell'interfaccia utente */
         function loadQuestion() {
@@ -260,8 +300,9 @@
 
         }
         
-        /** Crea e scarica un file .txt con il riepilogo del quiz */
-        function downloadResults() {
+        /** Crea e scarica un file .txt con il riepilogo del quiz e l'immagine di feedback */
+        async function downloadResults() {
+            // -- Parte 1: Download del file di testo (.txt) --
             let summaryText = `Riepilogo del Quiz\n\n`;
             summaryText += `PUNTEGGIO FINALE: ${score} / ${quizData.length}\n`;
             summaryText += `FEEDBACK: ${feedbackTextEl.textContent}\n\n`;
@@ -277,24 +318,50 @@
             });
             
             const blob = new Blob([summaryText], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
+            const textUrl = URL.createObjectURL(blob);
             
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'riepilogo_quiz.txt';
-            document.body.appendChild(a);
-            a.click();
-            
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            const a_text = document.createElement('a');
+            a_text.href = textUrl;
+            a_text.download = 'riepilogo_quiz.txt';
+            document.body.appendChild(a_text);
+            a_text.click();
+            document.body.removeChild(a_text);
+            URL.revokeObjectURL(textUrl);
+
+            // -- Parte 2: Download dell'immagine di feedback (.png) --
+            try {
+                // Fetch the image data from its source (works for local files and Base64 URLs)
+                const response = await fetch(feedbackImageEl.src);
+                const imageBlob = await response.blob();
+                
+                // Create a temporary URL for the blob
+                const imageUrl = URL.createObjectURL(imageBlob);
+
+                // Create a link and trigger the download
+                const a_image = document.createElement('a');
+                a_image.href = imageUrl; 
+                a_image.download = 'immagine_risultato.png';
+                document.body.appendChild(a_image);
+                a_image.click();
+                
+                // Clean up by removing the link and revoking the temporary URL
+                document.body.removeChild(a_image);
+                URL.revokeObjectURL(imageUrl);
+
+            } catch (error) {
+                console.error("Errore nel download dell'immagine:", error);
+                alert("Impossibile scaricare l'immagine. Potrebbe essere un problema con il percorso del file o le policy del browser.");
+            }
         }
 
         // --- Event Listeners ---
+        startBtn.addEventListener('click', startQuiz);
         nextBtn.addEventListener('click', handleNext);
         downloadBtn.addEventListener('click', downloadResults);
         
         // --- Caricamento Iniziale ---
-        window.addEventListener('load', loadQuestion);
+        // Rimosso il caricamento automatico della prima domanda
+        // window.addEventListener('load', loadQuestion);
 
     </script>
 </body>
