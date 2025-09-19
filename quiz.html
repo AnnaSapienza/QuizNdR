@@ -144,10 +144,15 @@
         }
         
         #feedback-text {
-            font-size: 1.2rem;
-            color: #fff;
-            font-weight: bold;
-            margin-bottom: 2rem;
+            display: none; /* Hidden as requested */
+        }
+        
+        #feedback-image {
+            display: none; /* Hidden by default, shown by JS */
+            max-width: 250px; /* Increased size */
+            height: auto;
+            margin: 1rem auto 2rem auto;
+            /* Frame styles removed */
         }
 
     </style>
@@ -157,7 +162,7 @@
     <div id="main-container">
         <div id="description-container">
             <h2>Caccia alle Fake News!</h2>
-            <p>Sei pronto a diventare un algoritmo? Metti alla prova il tuo "sesto senso" e scopri se riesci a riconoscere la verità dalle bugie. Inizia il quiz!</p>
+            <p>Sei pronto a diventare un algoritmo? Metti alla prova il tuo "sesto senso" e scopri se riesci a riconoscere la verità dalle fake news. Inizia il quiz!</p>
             <button id="start-btn">Inizia il Quiz</button>
         </div>
 
@@ -177,6 +182,7 @@
             <h2>Punteggio Finale</h2>
             <p id="score-text"></p>
             <p id="feedback-text"></p>
+            <img id="feedback-image" src="" alt="Immagine di feedback">
             <button id="download-btn">Scarica Riepilogo</button>
         </div>
     </div>
@@ -208,6 +214,7 @@
         const nextBtn = document.getElementById('next-btn');
         const scoreTextEl = document.getElementById('score-text');
         const feedbackTextEl = document.getElementById('feedback-text');
+        const feedbackImageEl = document.getElementById('feedback-image');
         const downloadBtn = document.getElementById('download-btn');
         
         function startQuiz() {
@@ -255,20 +262,27 @@
             resultsContainer.style.display = 'block';
             scoreTextEl.textContent = `${score} su ${quizData.length}`;
             let feedback;
+            let imageUrl;
+            
             if (score <= 2) {
-                feedback = "Algoritmo in fase di training";
+                feedback = "Algoritmo Principiante";
+                imageUrl = "feedback_training.png";
             } else if (score <= 5) {
-                feedback = "Algoritmo attento";
+                feedback = "Algoritmo Attento";
+                imageUrl = "feedback_attento.png";
             } else {
-                feedback = "Algoritmo esperto";
+                feedback = "Algoritmo Esperto";
+                imageUrl = "feedback_esperto.png";
             }
-            feedbackTextEl.textContent = feedback;
+            feedbackTextEl.textContent = feedback; // Text is set but not displayed
+            feedbackImageEl.src = imageUrl;
+            feedbackImageEl.style.display = 'block'; 
         }
         
         function downloadResults() {
             let summaryText = `Riepilogo del Quiz "Caccia alle Fake News"\n\n`;
             summaryText += `PUNTEGGIO FINALE: ${score} / ${quizData.length}\n`;
-            summaryText += `FEEDBACK: ${feedbackTextEl.textContent}\n\n`;
+            summaryText += `FEEDBACK: ${feedbackTextEl.textContent}\n\n`; // Correctly gets the hidden text
             summaryText += `--------------------------------------\n`;
             summaryText += `RIEPILOGO DELLE RISPOSTE\n`;
             summaryText += `--------------------------------------\n\n`;
