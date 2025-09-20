@@ -166,7 +166,7 @@
     <div id="main-container">
         <div id="description-container">
             <h2>Caccia alle Fake News!</h2>
-            <p>Sei pronto a diventare un algoritmo? Metti alla prova il tuo "sesto senso" e scopri se riesci a riconoscere la verità dalle bugie. Inizia il quiz!</p>
+            <p>Sei pronto a diventare un algoritmo? Metti alla prova il tuo "sesto senso" e scopri se riesci a riconoscere la verità dalle bugie!</p>
             <button id="start-btn">Inizia il Quiz</button>
         </div>
 
@@ -191,15 +191,20 @@
         </div>
     </div>
 
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Base64 images -->
+    <script src="images.js"></script>
+
     <script>
         const quizData = [
-            { label: "Domanda 1", question: "Le fake news sono semplici errori di distrazione.", answer: false },
-            { label: "Domanda 2", question: "Le fake news sono create apposta per ingannare chi legge.", answer: true },
-            { label: "Domanda 3", question: "Gli algoritmi di detection sono come dei detective digitali che proteggono dalle bufale.", answer: true },
-            { label: "Domanda 4", question: "L'attività euristica è un'abilità che solo i computer possiedono.", answer: false },
-            { label: "Domanda 5", question: "Un titolo 'click-bait' è generalmente un segnale di una notizia affidabile.", answer: false },
-            { label: "Domanda 6", question: "Un linguaggio molto emotivo può essere un indizio di una fake news.", answer: true },
-            { label: "Domanda 7", question: "Secondo il poster, l'obiettivo finale è che tu stesso diventi un 'algoritmo' nel riconoscere le bugie.", answer: true }
+            { label: "News 1", question: "Il metodo più pratico per separare il tuorlo dall'albume.", answer: true },
+            { label: "News 2", question: "Clima stabile da oltre due secoli.", answer: false },
+            { label: "News 3", question: "Un animale alieno mangia l'aglio.", answer: false },
+            { label: "News 4", question: "I motori a fulmini del futuro.", answer: true },
+            { label: "News 5", question: "I raggi cosmici ci attraverseranno questa sera.", answer: true },
+            { label: "News 6", question: "Perossido di idrogeno nel miele.", answer: true },
+            { label: "News 7", question: "Il trucchetto della nonna per padelle sempre splendenti.", answer: false }
         ];
 
         let currentQuestionIndex = 0;
@@ -220,7 +225,7 @@
         const feedbackTextEl = document.getElementById('feedback-text');
         const feedbackImageEl = document.getElementById('feedback-image');
         const downloadBtn = document.getElementById('download-btn');
-        
+
         function startQuiz() {
             descriptionContainer.style.display = 'none';
             quizContainer.style.display = 'block';
@@ -251,7 +256,7 @@
             userAnswersLog.push({
                 label: quizData[currentQuestionIndex].label,
                 question: quizData[currentQuestionIndex].question,
-                userAnswer: userAnswer,
+                userAnswer: userAnswer
             });
             currentQuestionIndex++;
             if (currentQuestionIndex < quizData.length) {
@@ -260,57 +265,132 @@
                 showResults();
             }
         }
-        
+
         function showResults() {
             quizContainer.style.display = 'none';
             resultsContainer.style.display = 'block';
             scoreTextEl.textContent = `${score} su ${quizData.length}`;
             let feedback;
             let imageUrl;
-            
-            if (score <= 2) {
-                feedback = "Algoritmo Principiante";
-                imageUrl = "feedback_training.png";
-            } else if (score <= 5) {
-                feedback = "Algoritmo Attento";
-                imageUrl = "feedback_attento.png";
-            } else {
-                feedback = "Algoritmo Esperto";
-                imageUrl = "feedback_esperto.png";
+
+            if (score <= 2) { 
+                feedback = "Algoritmo Principiante"; 
+                imageUrl = feedbackImages.training; 
+            } else if (score <= 5) { 
+                feedback = "Algoritmo Attento"; 
+                imageUrl = feedbackImages.attento; 
+            } else { 
+                feedback = "Algoritmo Esperto"; 
+                imageUrl = feedbackImages.esperto; 
             }
-            feedbackTextEl.textContent = feedback; // Text is set but not displayed
+            feedbackTextEl.textContent = feedback;
             feedbackImageEl.src = imageUrl;
-            feedbackImageEl.style.display = 'block'; 
-        }
-        
-        function downloadResults() {
-            let summaryText = `Riepilogo del Quiz "Caccia alle Fake News"\n\n`;
-            summaryText += `PUNTEGGIO FINALE: ${score} / ${quizData.length}\n`;
-            summaryText += `FEEDBACK: ${feedbackTextEl.textContent}\n\n`; // Correctly gets the hidden text
-            summaryText += `--------------------------------------\n`;
-            summaryText += `RIEPILOGO DELLE RISPOSTE\n`;
-            summaryText += `--------------------------------------\n\n`;
-            userAnswersLog.forEach((log) => {
-                const userAnswerText = log.userAnswer ? 'Vero' : 'Falso';
-                summaryText += `${log.label}: ${log.question}\n`;
-                summaryText += `  - La tua risposta: ${userAnswerText}\n\n`;
-            });
-            const blob = new Blob([summaryText], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'riepilogo_quiz.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            feedbackImageEl.style.display = 'block';
         }
 
-        // --- Event Listeners ---
+        function downloadResults() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 15;
+            let y = margin + 15;
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(24);
+            doc.setTextColor(217, 4, 41);
+            doc.text('CACCIA ALLE FAKE NEWS', pageWidth/2, y, { align: "center" });
+
+            if (feedbackImageEl && feedbackImageEl.src) {
+                const imgData = feedbackImageEl.src;
+                const imgHeight = 80;
+                const imgWidth = 80* 787 / 1024;
+                const x = (pageWidth - imgWidth)/2;
+                let yPos = y + 5;
+                if (yPos + imgHeight > pageHeight - margin) {
+                    doc.addPage();
+                    yPos = margin;
+                }
+                doc.addImage(imgData, 'PNG', x, yPos, imgWidth, imgHeight);
+            }
+
+            y += 95;
+
+            doc.setFontSize(14);
+            doc.setTextColor(0,0,0);
+            doc.text(`PUNTEGGIO FINALE: ${score} / ${quizData.length}`, pageWidth/2, y, { align: "center" });
+            y += 10;
+            // doc.text(`FEEDBACK: ${feedbackTextEl.textContent}`, margin, y);
+            // y += 15;
+
+            doc.setDrawColor(250, 217, 16);
+            doc.setLineWidth(2);
+            doc.line(margin, y, pageWidth-margin, y);
+            y += 10;
+
+            doc.setFontSize(12);
+            const lineSpacing = 7;
+
+            userAnswersLog.forEach((log) => {
+                const userAnswerText = log.userAnswer ? 'Vero' : 'Falso';
+                
+                // Split the question text so it fits the page width
+                const questionLines = doc.splitTextToSize(log.question, pageWidth - 2*margin);
+                
+                // If not enough space, add a new page
+                if (y + (questionLines.length + 1)*lineSpacing > pageHeight - margin) {
+                    doc.addPage();
+                    y = margin;
+                }
+                
+                // Draw the label in bold red
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor(217, 4, 41); // red used in your quiz
+                doc.text(`${log.label}:`, margin, y);
+                
+                const labelWidth = doc.getTextWidth(`${log.label}: `);
+                
+                // Draw the question in normal black next to label (or below)
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(0,0,0);
+                doc.text(questionLines, margin+labelWidth, y);
+                
+                // Draw user's answer in yellow below question
+                doc.setFont("helvetica", "normal");
+                //doc.setTextColor(250, 217, 16); // yellow from quiz
+                //doc.text(`- La tua risposta: ${userAnswerText}`, margin, y + 5);
+
+                doc.text("- La tua risposta: ", margin, y + 5);
+
+                // Bold text for the answer
+                doc.setFont("helvetica", "bold");
+                doc.text(`${userAnswerText}`, margin + doc.getTextWidth("- La tua risposta: "), y + 5);
+
+                
+                // Update y position for next entry
+                y += (questionLines.length + 1)*lineSpacing + 5;
+            });
+
+            // doc.setFont("helvetica", "normal");
+            // doc.setFontSize(12);
+            // userAnswersLog.forEach((log) => {
+            //     const userAnswerText = log.userAnswer ? 'Vero' : 'Falso';
+            //     const entry = `${log.label}: ${log.question}\n - La tua risposta: ${userAnswerText}`;
+            //     const splitText = doc.splitTextToSize(entry, pageWidth - 2*margin);
+            //     if (y + splitText.length*7 > pageHeight - margin) {
+            //         doc.addPage();
+            //         y = margin;
+            //     }
+            //     doc.text(splitText, margin, y);
+            //     y += splitText.length*7 + 5;
+            // });
+
+            doc.save('riepilogo_quiz.pdf');
+        }
+
         startBtn.addEventListener('click', startQuiz);
         nextBtn.addEventListener('click', handleNext);
         downloadBtn.addEventListener('click', downloadResults);
-
-    </script>
+        </script>
 </body>
 </html>
