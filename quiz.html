@@ -294,12 +294,21 @@
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
             const margin = 15;
-            let y = margin + 15;
+            let y = margin + 60;
+
+            doc.addImage(feedbackImages.background, 'PNG', 0, 0, pageWidth, pageHeight);
+
+            // Then draw all text and images on top
 
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(24);
-            doc.setTextColor(217, 4, 41);
-            doc.text('CACCIA ALLE FAKE NEWS', pageWidth/2, y, { align: "center" });
+            // doc.setFontSize(24);
+            // doc.setTextColor(217, 4, 41);
+            // doc.text('CACCIA ALLE FAKE NEWS', pageWidth/2, y, { align: "center" });
+
+            doc.setFontSize(18);
+            doc.setTextColor(0,0,0);
+            doc.text(`PUNTEGGIO FINALE: ${score} / ${quizData.length}`, pageWidth/2, y, { align: "center" });
+            y += 2;
 
             if (feedbackImageEl && feedbackImageEl.src) {
                 const imgData = feedbackImageEl.src;
@@ -316,20 +325,16 @@
 
             y += 95;
 
-            doc.setFontSize(14);
-            doc.setTextColor(0,0,0);
-            doc.text(`PUNTEGGIO FINALE: ${score} / ${quizData.length}`, pageWidth/2, y, { align: "center" });
-            y += 10;
             // doc.text(`FEEDBACK: ${feedbackTextEl.textContent}`, margin, y);
             // y += 15;
 
-            doc.setDrawColor(250, 217, 16);
-            doc.setLineWidth(2);
-            doc.line(margin, y, pageWidth-margin, y);
-            y += 10;
+            // doc.setDrawColor(250, 217, 16);
+            // doc.setLineWidth(2);
+            // doc.line(margin, y, pageWidth-margin, y);
+            // y += 10;
 
             doc.setFontSize(12);
-            const lineSpacing = 7;
+            const lineSpacing = 4;
 
             userAnswersLog.forEach((log) => {
                 const userAnswerText = log.userAnswer ? 'Vero' : 'Falso';
@@ -346,25 +351,25 @@
                 // Draw the label in bold red
                 doc.setFont("helvetica", "bold");
                 doc.setTextColor(217, 4, 41); // red used in your quiz
-                doc.text(`${log.label}:`, margin, y);
+                doc.text(`${log.label}:`, margin+30, y);
                 
                 const labelWidth = doc.getTextWidth(`${log.label}: `);
                 
                 // Draw the question in normal black next to label (or below)
                 doc.setFont("helvetica", "normal");
                 doc.setTextColor(0,0,0);
-                doc.text(questionLines, margin+labelWidth, y);
+                doc.text(questionLines, margin+30+labelWidth, y);
                 
                 // Draw user's answer in yellow below question
                 doc.setFont("helvetica", "normal");
                 //doc.setTextColor(250, 217, 16); // yellow from quiz
                 //doc.text(`- La tua risposta: ${userAnswerText}`, margin, y + 5);
 
-                doc.text("- La tua risposta: ", margin, y + 5);
+                doc.text("- La tua risposta: ", margin+30, y + 5);
 
                 // Bold text for the answer
                 doc.setFont("helvetica", "bold");
-                doc.text(`${userAnswerText}`, margin + doc.getTextWidth("- La tua risposta: "), y + 5);
+                doc.text(`${userAnswerText}`, margin +30+ doc.getTextWidth("- La tua risposta: "), y + 5);
 
                 
                 // Update y position for next entry
